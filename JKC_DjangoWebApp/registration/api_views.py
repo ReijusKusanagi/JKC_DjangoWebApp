@@ -1,8 +1,6 @@
 from django.http import JsonResponse
-# from django.views.decorators.csrf import csrf_exempt
 from .models import Student
 
-# @csrf_exempt
 def api_student_list(request):
     if not request.user.is_authenticated:
         return JsonResponse(
