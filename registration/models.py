@@ -8,5 +8,6 @@ class Student(models.Model):
     year_level = models.IntegerField()
     email = models.EmailField()
     
+    
     def __str__(self):
         return self.student_name
