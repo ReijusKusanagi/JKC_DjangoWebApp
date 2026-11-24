@@ -65,22 +65,30 @@ def student_delete(request, pk):
     )
     
 def student_dashboard(request):
-    students = Student.objects.all()
-    total_students = students.count()
+    search_query = request.GET.get('search', '')
+    program_filter = request.GET.get('program', '')
 
-    program_summary = (
-        students
-        .values('program')
-        .annotate(total=Count('id'))
-        .order_by('program')
-    )
+    # 1. Summary Queryset
+    summary_students = Student.objects.all()
+
+    if search_query:
+        # FIXED: Changed 'name' to 'student_name'
+        summary_students = summary_students.filter(student_name__icontains=search_query) | summary_students.filter(email__icontains=search_query)
+    if program_filter:
+        summary_students = summary_students.filter(program=program_filter)
+
+    total_students = summary_students.count() 
+    program_summary = summary_students.values('program').annotate(total=Count('id')).order_by('program') 
+    year_summary = summary_students.values('year_level').annotate(total=Count('id')).order_by('year_level') 
+
+    # 2. Table Queryset
+    table_students = Student.objects.all()
     
-    year_summary = (
-        students
-        .values('year_level')
-        .annotate(total=Count('id'))
-        .order_by('year_level')
-        )
+    if search_query:
+        # FIXED: Changed 'name' to 'student_name'
+        table_students = table_students.filter(student_name__icontains=search_query) | table_students.filter(email__icontains=search_query)
+    if program_filter:
+        table_students = table_students.filter(program=program_filter)
 
     return render(
         request,
@@ -89,5 +97,8 @@ def student_dashboard(request):
             'total_students': total_students,
             'program_summary': program_summary,
             'year_summary': year_summary,
+            'students': table_students, 
+            'search_query': search_query,
+            'program_filter': program_filter,
         }
     )
