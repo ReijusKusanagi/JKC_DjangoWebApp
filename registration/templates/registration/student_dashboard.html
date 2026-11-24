@@ -10,9 +10,7 @@
     <h1>Student Dashboard</h1>
     
     <h2>Total Students</h2>
-    <p>
-        {{ total_students }}
-    </p>
+    <p>{{ total_students }}</p>
     
     <hr>
     
@@ -29,9 +27,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="2">
-                No program data available.
-            </td>
+            <td colspan="2">No program data available.</td>
         </tr>
         {% endfor %}
     </table>
@@ -51,63 +47,75 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="2">
-                No year-level data available.
-            </td>
+            <td colspan="2">No year-level data available.</td>
         </tr>
         {% endfor %}
     </table>
     
     <hr>
     
-    <a href="{% url 'student_list' %}">
-        Back to Student List
-    </a>
+    <a href="{% url 'student_list' %}">Back to Student List</a>
 
     <section>
-    <label for="student-search">Search name or email:</label>
-    <input
-        type="search"
-        id="student-search"
-        placeholder="Type a name or email"
-    >
+        <!-- Form added to submit search queries -->
+        <form method="GET" action="">
+            <label for="student-search">Search name or email:</label>
+            <input
+                type="search"
+                id="student-search"
+                name="search"
+                placeholder="Type a name or email"
+                value="{{ search_query }}"
+            >
 
-    <label for="program-filter">Filter by program:</label>
-    <select id="program-filter">
-        <option value="">All programs</option>
-    </select>
+            <label for="program-filter">Filter by program:</label>
+            <select id="program-filter" name="program">
+                <option value="">All programs</option>
+                <option value="BSAF" {% if program_filter == 'BSAF' %}selected{% endif %}>BSAF</option>
+                <option value="BSCE" {% if program_filter == 'BSCE' %}selected{% endif %}>BSCE</option>
+                <option value="BSIT" {% if program_filter == 'BSIT' %}selected{% endif %}>BSIT</option>
+                <option value="BSITDA" {% if program_filter == 'BSITDA' %}selected{% endif %}>BSITDA</option>
+                <option value="BSITWMD" {% if program_filter == 'BSITWMD' %}selected{% endif %}>BSITWMD</option>
+            </select>
 
-    <button type="button" id="clear-filters">Clear Filters</button>
-    <button type="button" id="refresh-students">Refresh Data</button>
+            <button type="submit">Search</button>
+            <a href="{% url 'student_dashboard' %}"><button type="button">Clear Filters</button></a>
+        </form>
+    </section>
 
-    <p id="result-count" aria-live="polite">Showing 0 students</p>
-</section>
+    <h2>Student List</h2>
 
-    <h2>
-    Total Students:
-    <span id="student-count">0</span>
-</h2>
+    <table border="1" id="student-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Program</th>
+                <th>Year Level</th>
+                <th>Email</th>
+            </tr>
+        </thead>
 
-<p id="loading-message">Loading students...</p>
+        <tbody id="student-table-body">
+            <!-- This loop triggers the 4th SQL query -->
+            {% for student in students %}
+            <tr>
+                <td>{{ student.id }}</td>
+                <td>{{ student.student_name }}</td>
+                <td>{{ student.program }}</td>
+                <td>{{ student.year_level }}</td>
+                <td>{{ student.email }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No students found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<p id="error-message"></p>
-
-<table border="1" id="student-table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Program</th>
-            <th>Year Level</th>
-            <th>Email</th>
-        </tr>
-    </thead>
-
-    <tbody id="student-table-body">
-    </tbody>
-</table>
+    <!-- Commented out JS so it stops interfering with the SQL tracking -->
+    <!-- <script src="{% static 'registration/js/student_dashboard.js' %}"></script> -->
 
 </body>
 </html>
-
-<script src="{% static 'registration/js/student_dashboard.js' %}"> </script>
